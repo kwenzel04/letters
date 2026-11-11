@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f1efff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#16142e" media="(prefers-color-scheme: dark)">
+  <title>Buchstaben lernen</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="modes" role="group" aria-label="Modus">
+        <button class="mode" data-mode="both" aria-pressed="true" aria-label="Groß und klein">Aa</button>
+        <button class="mode" data-mode="upper" aria-pressed="false" aria-label="Nur Großbuchstaben">A</button>
+        <button class="mode" data-mode="lower" aria-pressed="false" aria-label="Nur Kleinbuchstaben">a</button>
+      </div>
+      <div class="progress-row">
+        <div class="progress" role="progressbar" aria-label="Fortschritt" aria-valuemin="0" aria-valuemax="100" id="progress">
+          <div class="bar" id="bar"></div>
+        </div>
+        <p id="count" aria-live="polite"></p>
+      </div>
+    </header>
+
+    <section class="stage">
+      <div class="deck" id="deck">
+        <div class="card ghost" id="ghost"></div>
+        <div class="card" id="card">
+          <span id="letter"></span>
+          <div class="tint tint-yes" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+          </div>
+          <div class="tint tint-no" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="done" id="done" hidden>
+        <svg class="done-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke-width="1.6"/><path d="M7.5 12.5l3 3 6-6.5"/></svg>
+        <p class="done-title">Geschafft!</p>
+        <p class="done-stat" id="stat"></p>
+        <button id="restart" class="btn primary">Nochmal</button>
+      </div>
+    </section>
+
+    <footer class="answers" id="answers">
+      <button id="no" class="btn no">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+        Weiß ich nicht
+      </button>
+      <button id="yes" class="btn yes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>
+        Weiß ich
+      </button>
+    </footer>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
