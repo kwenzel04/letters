@@ -11,11 +11,40 @@
 <body>
   <div class="app">
     <header>
-      <div class="modes" role="group" aria-label="Modus">
+      <!-- Hauptmodus: Buchstaben / Silben -->
+      <div class="main-modes" role="group" aria-label="Hauptmodus">
+        <button class="main-mode" data-mainmode="letters" aria-pressed="true">Buchstaben</button>
+        <button class="main-mode" data-mainmode="syllables" aria-pressed="false">Silben</button>
+      </div>
+
+      <!-- Buchstaben-Modi -->
+      <div class="modes" id="letter-modes" role="group" aria-label="Modus">
         <button class="mode" data-mode="both" aria-pressed="true" aria-label="Groß und klein">Aa</button>
         <button class="mode" data-mode="upper" aria-pressed="false" aria-label="Nur Großbuchstaben">A</button>
         <button class="mode" data-mode="lower" aria-pressed="false" aria-label="Nur Kleinbuchstaben">a</button>
       </div>
+
+      <!-- Silben-Einstellungen -->
+      <div class="syllable-settings" id="syllable-settings" hidden>
+        <div class="setting-group">
+          <label class="setting-label">Silben:</label>
+          <div class="syllable-count-btns" role="group" aria-label="Silbenanzahl">
+            <button class="syl-count" data-count="1" aria-pressed="false">1</button>
+            <button class="syl-count" data-count="2" aria-pressed="true">2</button>
+            <button class="syl-count" data-count="3" aria-pressed="false">3</button>
+            <button class="syl-count" data-count="4" aria-pressed="false">4</button>
+          </div>
+        </div>
+        <div class="setting-group">
+          <label class="setting-label">Vokale:</label>
+          <div class="letter-toggles" id="vowel-toggles"></div>
+        </div>
+        <div class="setting-group">
+          <label class="setting-label">Konsonanten:</label>
+          <div class="letter-toggles" id="consonant-toggles"></div>
+        </div>
+      </div>
+
       <div class="progress-row">
         <div class="progress" role="progressbar" aria-label="Fortschritt" aria-valuemin="0" aria-valuemax="100" id="progress">
           <div class="bar" id="bar"></div>

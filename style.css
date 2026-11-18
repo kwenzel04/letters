@@ -74,7 +74,32 @@ body {
   gap: 14px;
 }
 
-/* Modus-Umschalter */
+/* Hauptmodus-Umschalter (Buchstaben / Silben) */
+.main-modes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 5px;
+  background: var(--surface);
+  border-radius: 20px;
+  margin-bottom: 8px;
+}
+
+.main-mode {
+  font: inherit;
+  font-size: 1.2rem;
+  line-height: 1;
+  min-height: 44px;
+  border: 0;
+  border-radius: 15px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background .2s, color .2s;
+}
+.main-mode[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); }
+
+/* Buchstaben-Modus-Umschalter */
 .modes {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -97,6 +122,71 @@ body {
   transition: background .2s, color .2s;
 }
 .mode[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); }
+
+/* Silben-Einstellungen */
+.syllable-settings {
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.setting-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.setting-label {
+  font-size: 1rem;
+  color: var(--muted);
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+.syllable-count-btns {
+  display: flex;
+  gap: 4px;
+}
+
+.syl-count {
+  font: inherit;
+  font-size: 1.2rem;
+  width: 44px;
+  height: 40px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--track);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background .2s, color .2s;
+}
+.syl-count[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); }
+
+.letter-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.letter-toggle {
+  font: inherit;
+  font-size: 1.1rem;
+  width: 38px;
+  height: 36px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--track);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background .2s, color .2s, opacity .2s;
+}
+.letter-toggle[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); }
+.letter-toggle[aria-pressed="false"] { opacity: .45; }
+.letter-toggle-wide { width: auto; padding: 0 10px; min-width: 48px; }
 
 /* Fortschritt */
 .progress-row {
@@ -165,7 +255,10 @@ body {
 }
 .card.dragging { transition: none; cursor: grabbing; }
 
-#letter { padding-bottom: .05em; pointer-events: none; }
+#letter { padding: 0 16px .05em; pointer-events: none; max-width: 100%; text-align: center; white-space: nowrap; }
+
+/* Kleinere Schrift für Silben-Wörter */
+.syllable-card { font-size: min(28vw, 18vh); font-size: min(28vw, 18dvh); overflow: hidden; }
 .card[data-c="1"] { color: var(--l1); }
 .card[data-c="2"] { color: var(--l2); }
 .card[data-c="3"] { color: var(--l3); }

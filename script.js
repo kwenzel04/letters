@@ -3,6 +3,10 @@ const LOWER = "abcdefghijklmnopqrstuvwxyzäöüß".split("");
 const COLOR_COUNT = 6; // Farben stehen im CSS (--l0 bis --l5)
 const THRESHOLD = 90; // Pixel, ab denen ein Wisch zählt
 
+const ALL_VOWELS = ["a", "e", "i", "o", "u", "ä", "ö", "ü", "ei", "eu"];
+const ALL_CONSONANTS = ["b", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "r", "s", "t", "w"];
+const SYLLABLE_WORD_COUNT = 20; // Wie viele Wörter pro Runde
+
 const $ = (id) => document.getElementById(id);
 const card = $("card");
 const letterEl = $("letter");
@@ -17,11 +21,17 @@ const statEl = $("stat");
 
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+let mainMode = "letters"; // "letters" oder "syllables"
 let mode = "both";
 let queue = [];
 let total = 0;
 let misses = new Set();
 let busy = false;
+
+// Silben-Einstellungen
+let syllableCount = 2;
+let activeVowels = new Set(ALL_VOWELS);
+let activeConsonants = new Set(ALL_CONSONANTS);
 
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
@@ -37,8 +47,107 @@ function buildDeck() {
   return [...UPPER, ...LOWER];
 }
 
+/* ---- Silben-Generator ---- */
+function pickRandom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function generateWord(numSyllables, vowels, consonants) {
+  // Strikt alternierend: V-K-V-K... oder K-V-K-V...
+  // Jede Silbe = ein Paar (2 Laute)
+  const totalPairs = numSyllables;
+  const startWithVowel = Math.random() < 0.5;
+  let word = "";
+  for (let i = 0; i < totalPairs; i++) {
+    if (startWithVowel) {
+      word += pickRandom(vowels) + pickRandom(consonants);
+    } else {
+      word += pickRandom(consonants) + pickRandom(vowels);
+    }
+  }
+  // Zufällig groß oder klein am Anfang
+  if (Math.random() < 0.5) {
+    word = word.charAt(0).toUpperCase() + word.slice(1);
+  }
+  return word;
+}
+
+function buildSyllableDeck() {
+  const vowels = [...activeVowels];
+  const consonants = [...activeConsonants];
+
+  if (vowels.length === 0 || consonants.length === 0) {
+    return ["---"]; // Fallback
+  }
+
+  const words = new Set();
+  let attempts = 0;
+  while (words.size < SYLLABLE_WORD_COUNT && attempts < 200) {
+    words.add(generateWord(syllableCount, vowels, consonants));
+    attempts++;
+  }
+  return [...words];
+}
+
+/* ---- UI: Silben-Einstellungen ---- */
+function initSyllableSettings() {
+  const vowelContainer = $("vowel-toggles");
+  const consonantContainer = $("consonant-toggles");
+
+  ALL_VOWELS.forEach(v => {
+    const btn = document.createElement("button");
+    btn.className = "letter-toggle";
+    if (v.length > 1) btn.classList.add("letter-toggle-wide");
+    btn.textContent = v.toUpperCase();
+    btn.dataset.letter = v;
+    btn.setAttribute("aria-pressed", "true");
+    btn.addEventListener("click", () => {
+      const active = btn.getAttribute("aria-pressed") === "true";
+      // Mindestens 1 Vokal muss aktiv bleiben
+      if (active && activeVowels.size <= 1) return;
+      btn.setAttribute("aria-pressed", String(!active));
+      if (active) activeVowels.delete(v);
+      else activeVowels.add(v);
+      start();
+    });
+    vowelContainer.appendChild(btn);
+  });
+
+  ALL_CONSONANTS.forEach(c => {
+    const btn = document.createElement("button");
+    btn.className = "letter-toggle";
+    btn.textContent = c.toUpperCase();
+    btn.dataset.letter = c;
+    btn.setAttribute("aria-pressed", "true");
+    btn.addEventListener("click", () => {
+      const active = btn.getAttribute("aria-pressed") === "true";
+      // Mindestens 1 Konsonant muss aktiv bleiben
+      if (active && activeConsonants.size <= 1) return;
+      btn.setAttribute("aria-pressed", String(!active));
+      if (active) activeConsonants.delete(c);
+      else activeConsonants.add(c);
+      start();
+    });
+    consonantContainer.appendChild(btn);
+  });
+
+  document.querySelectorAll(".syl-count").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".syl-count").forEach(b => b.setAttribute("aria-pressed", "false"));
+      btn.setAttribute("aria-pressed", "true");
+      syllableCount = parseInt(btn.dataset.count, 10);
+      start();
+    });
+  });
+}
+
+/* ---- Start ---- */
 function start() {
-  queue = shuffle(buildDeck());
+  if (mainMode === "syllables") {
+    queue = shuffle(buildSyllableDeck());
+  } else {
+    queue = shuffle(buildDeck());
+  }
   total = queue.length;
   misses = new Set();
   render();
@@ -61,6 +170,26 @@ function render() {
   }
   const letter = queue[0];
   letterEl.textContent = letter;
+
+  // Schriftgröße dynamisch anpassen für Silben-Wörter
+  if (mainMode === "syllables") {
+    card.classList.add("syllable-card");
+    const len = letter.length;
+    // Je länger das Wort, desto kleiner die Schrift
+    if (len <= 3) {
+      letterEl.style.fontSize = "";
+    } else if (len <= 5) {
+      letterEl.style.fontSize = "min(18vw, 14vh)";
+    } else if (len <= 7) {
+      letterEl.style.fontSize = "min(13vw, 10vh)";
+    } else {
+      letterEl.style.fontSize = "min(10vw, 8vh)";
+    }
+  } else {
+    card.classList.remove("syllable-card");
+    letterEl.style.fontSize = "";
+  }
+
   // gleiche Farbe für Groß- und Kleinbuchstabe
   card.dataset.c = letter.toLowerCase().charCodeAt(0) % COLOR_COUNT;
   ghost.hidden = queue.length < 2;
@@ -148,6 +277,7 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "ArrowLeft") answer(false);
 });
 
+/* Buchstaben-Modi */
 document.querySelectorAll(".mode").forEach((btn) => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".mode").forEach((b) => b.setAttribute("aria-pressed", "false"));
@@ -157,4 +287,21 @@ document.querySelectorAll(".mode").forEach((btn) => {
   });
 });
 
+/* Hauptmodus-Umschalter */
+document.querySelectorAll(".main-mode").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".main-mode").forEach((b) => b.setAttribute("aria-pressed", "false"));
+    btn.setAttribute("aria-pressed", "true");
+    mainMode = btn.dataset.mainmode;
+
+    // UI umschalten
+    $("letter-modes").hidden = mainMode !== "letters";
+    $("syllable-settings").hidden = mainMode !== "syllables";
+
+    start();
+  });
+});
+
+/* Init */
+initSyllableSettings();
 start();
