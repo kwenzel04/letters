@@ -177,7 +177,7 @@ function render() {
     const len = letter.length;
     // Basiert auf tatsächlicher Kartenbreite statt Viewport
     const cardWidth = card.clientWidth || 300;
-    const px = Math.min(cardWidth * 0.75, Math.max(28, (cardWidth * 1.1) / len));
+    const px = Math.min(cardWidth * 0.8, Math.max(32, (cardWidth * 1.3) / len));
     letterEl.style.fontSize = px + "px";
   } else {
     card.classList.remove("syllable-card");
