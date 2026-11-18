@@ -123,14 +123,39 @@ body {
 }
 .mode[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); }
 
-/* Silben-Einstellungen */
+/* Silben-Einstellungen (ausklappbar) */
 .syllable-settings {
   background: var(--surface);
   border-radius: 20px;
-  padding: 12px 14px;
+}
+
+.settings-toggle {
+  font: inherit;
+  font-size: 1.1rem;
+  color: var(--muted);
+  padding: 12px 16px;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.settings-toggle::-webkit-details-marker { display: none; }
+.settings-toggle::after {
+  content: "▸";
+  transition: transform .2s;
+}
+.syllable-settings[open] > .settings-toggle::after {
+  transform: rotate(90deg);
+}
+
+.settings-body {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  padding: 0 14px 14px;
 }
 
 .setting-group {
@@ -228,10 +253,10 @@ body {
 
 .deck {
   position: relative;
+  width: 100%;
   height: 100%;
   max-height: 560px;
-  aspect-ratio: 4 / 5;
-  max-width: 100%;
+  max-width: 480px;
 }
 
 .card {
@@ -255,10 +280,10 @@ body {
 }
 .card.dragging { transition: none; cursor: grabbing; }
 
-#letter { padding: 0 16px .05em; pointer-events: none; max-width: 100%; text-align: center; white-space: nowrap; }
+#letter { padding: 0 20px .05em; pointer-events: none; max-width: 100%; text-align: center; white-space: nowrap; }
 
 /* Kleinere Schrift für Silben-Wörter */
-.syllable-card { font-size: min(28vw, 18vh); font-size: min(28vw, 18dvh); overflow: hidden; }
+.syllable-card { overflow: hidden; }
 .card[data-c="1"] { color: var(--l1); }
 .card[data-c="2"] { color: var(--l2); }
 .card[data-c="3"] { color: var(--l3); }

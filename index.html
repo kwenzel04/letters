@@ -24,26 +24,29 @@
         <button class="mode" data-mode="lower" aria-pressed="false" aria-label="Nur Kleinbuchstaben">a</button>
       </div>
 
-      <!-- Silben-Einstellungen -->
-      <div class="syllable-settings" id="syllable-settings" hidden>
-        <div class="setting-group">
-          <label class="setting-label">Silben:</label>
-          <div class="syllable-count-btns" role="group" aria-label="Silbenanzahl">
-            <button class="syl-count" data-count="1" aria-pressed="false">1</button>
-            <button class="syl-count" data-count="2" aria-pressed="true">2</button>
-            <button class="syl-count" data-count="3" aria-pressed="false">3</button>
-            <button class="syl-count" data-count="4" aria-pressed="false">4</button>
+      <!-- Silben-Einstellungen (ausklappbar) -->
+      <details class="syllable-settings" id="syllable-settings" hidden>
+        <summary class="settings-toggle">Einstellungen</summary>
+        <div class="settings-body">
+          <div class="setting-group">
+            <label class="setting-label">Silben:</label>
+            <div class="syllable-count-btns" role="group" aria-label="Silbenanzahl">
+              <button class="syl-count" data-count="1" aria-pressed="false">1</button>
+              <button class="syl-count" data-count="2" aria-pressed="true">2</button>
+              <button class="syl-count" data-count="3" aria-pressed="false">3</button>
+              <button class="syl-count" data-count="4" aria-pressed="false">4</button>
+            </div>
+          </div>
+          <div class="setting-group">
+            <label class="setting-label">Vokale:</label>
+            <div class="letter-toggles" id="vowel-toggles"></div>
+          </div>
+          <div class="setting-group">
+            <label class="setting-label">Konsonanten:</label>
+            <div class="letter-toggles" id="consonant-toggles"></div>
           </div>
         </div>
-        <div class="setting-group">
-          <label class="setting-label">Vokale:</label>
-          <div class="letter-toggles" id="vowel-toggles"></div>
-        </div>
-        <div class="setting-group">
-          <label class="setting-label">Konsonanten:</label>
-          <div class="letter-toggles" id="consonant-toggles"></div>
-        </div>
-      </div>
+      </details>
 
       <div class="progress-row">
         <div class="progress" role="progressbar" aria-label="Fortschritt" aria-valuemin="0" aria-valuemax="100" id="progress">

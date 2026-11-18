@@ -175,16 +175,10 @@ function render() {
   if (mainMode === "syllables") {
     card.classList.add("syllable-card");
     const len = letter.length;
-    // Je länger das Wort, desto kleiner die Schrift
-    if (len <= 3) {
-      letterEl.style.fontSize = "";
-    } else if (len <= 5) {
-      letterEl.style.fontSize = "min(18vw, 14vh)";
-    } else if (len <= 7) {
-      letterEl.style.fontSize = "min(13vw, 10vh)";
-    } else {
-      letterEl.style.fontSize = "min(10vw, 8vh)";
-    }
+    // Basiert auf tatsächlicher Kartenbreite statt Viewport
+    const cardWidth = card.clientWidth || 300;
+    const px = Math.min(cardWidth * 0.75, Math.max(28, (cardWidth * 1.1) / len));
+    letterEl.style.fontSize = px + "px";
   } else {
     card.classList.remove("syllable-card");
     letterEl.style.fontSize = "";
@@ -296,7 +290,12 @@ document.querySelectorAll(".main-mode").forEach((btn) => {
 
     // UI umschalten
     $("letter-modes").hidden = mainMode !== "letters";
-    $("syllable-settings").hidden = mainMode !== "syllables";
+    const sylSettings = $("syllable-settings");
+    if (mainMode === "syllables") {
+      sylSettings.removeAttribute("hidden");
+    } else {
+      sylSettings.setAttribute("hidden", "");
+    }
 
     start();
   });
