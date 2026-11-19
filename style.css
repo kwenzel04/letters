@@ -74,10 +74,10 @@ body {
   gap: 14px;
 }
 
-/* Hauptmodus-Umschalter (Buchstaben / Silben) */
+/* Hauptmodus-Umschalter (Buchstaben / Silben / Wörter) */
 .main-modes {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 4px;
   padding: 5px;
   background: var(--surface);
@@ -87,7 +87,8 @@ body {
 
 .main-mode {
   font: inherit;
-  font-size: 1.2rem;
+  font-size: clamp(0.95rem, 3.5vw, 1.2rem);
+  padding: 0 4px;
   line-height: 1;
   min-height: 44px;
   border: 0;
@@ -96,6 +97,7 @@ body {
   color: var(--muted);
   cursor: pointer;
   transition: background .2s, color .2s;
+  white-space: nowrap;
 }
 .main-mode[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); }
 
@@ -160,27 +162,55 @@ body {
 
 .setting-group {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  flex-direction: column;
   gap: 6px;
+}
+
+.setting-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .setting-label {
   font-size: 1rem;
+  font-weight: 500;
   color: var(--muted);
-  min-width: 100px;
-  flex-shrink: 0;
+}
+
+.quick-btns {
+  display: flex;
+  gap: 6px;
+}
+
+.quick-btn {
+  font: inherit;
+  font-size: 0.82rem;
+  padding: 3px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--track);
+  color: var(--ink);
+  cursor: pointer;
+  transition: opacity .15s, background .15s;
+}
+.quick-btn:hover {
+  background: var(--primary);
+  color: var(--on-primary);
 }
 
 .syllable-count-btns {
   display: flex;
-  gap: 4px;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .syl-count {
   font: inherit;
-  font-size: 1.2rem;
-  width: 44px;
+  font-size: 1.1rem;
+  min-width: 44px;
+  padding: 0 10px;
   height: 40px;
   border: 0;
   border-radius: 12px;
@@ -190,6 +220,14 @@ body {
   transition: background .2s, color .2s;
 }
 .syl-count[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); }
+
+.words-found-info {
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--muted);
+  padding: 6px 0 2px;
+  border-top: 1px solid var(--track);
+}
 
 .letter-toggles {
   display: flex;

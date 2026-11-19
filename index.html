@@ -11,10 +11,11 @@
 <body>
   <div class="app">
     <header>
-      <!-- Hauptmodus: Buchstaben / Silben -->
+      <!-- Hauptmodus: Buchstaben / Silben / Wörter -->
       <div class="main-modes" role="group" aria-label="Hauptmodus">
         <button class="main-mode" data-mainmode="letters" aria-pressed="true">Buchstaben</button>
         <button class="main-mode" data-mainmode="syllables" aria-pressed="false">Silben</button>
+        <button class="main-mode" data-mainmode="words" aria-pressed="false">Wörter</button>
       </div>
 
       <!-- Buchstaben-Modi -->
@@ -24,13 +25,14 @@
         <button class="mode" data-mode="lower" aria-pressed="false" aria-label="Nur Kleinbuchstaben">a</button>
       </div>
 
-      <!-- Silben-Einstellungen (ausklappbar) -->
+      <!-- Silben- und Wörter-Einstellungen (ausklappbar) -->
       <details class="syllable-settings" id="syllable-settings" hidden>
-        <summary class="settings-toggle">Einstellungen</summary>
+        <summary class="settings-toggle" id="settings-summary">Einstellungen</summary>
         <div class="settings-body">
-          <div class="setting-group">
+          <div class="setting-group" id="syllable-count-group">
             <label class="setting-label">Silben:</label>
-            <div class="syllable-count-btns" role="group" aria-label="Silbenanzahl">
+            <div class="syllable-count-btns" id="syl-count-btns" role="group" aria-label="Silbenanzahl">
+              <button class="syl-count" id="syl-count-all" data-count="all" aria-pressed="true" hidden>Alle</button>
               <button class="syl-count" data-count="1" aria-pressed="false">1</button>
               <button class="syl-count" data-count="2" aria-pressed="true">2</button>
               <button class="syl-count" data-count="3" aria-pressed="false">3</button>
@@ -38,12 +40,27 @@
             </div>
           </div>
           <div class="setting-group">
-            <label class="setting-label">Vokale:</label>
+            <div class="setting-label-row">
+              <label class="setting-label">Vokale:</label>
+              <div class="quick-btns">
+                <button type="button" class="quick-btn" id="vowels-all" title="Alle Vokale anwählen">Alle</button>
+                <button type="button" class="quick-btn" id="vowels-none" title="Alle Vokale abwählen">Keine</button>
+              </div>
+            </div>
             <div class="letter-toggles" id="vowel-toggles"></div>
           </div>
           <div class="setting-group">
-            <label class="setting-label">Konsonanten:</label>
+            <div class="setting-label-row">
+              <label class="setting-label">Konsonanten:</label>
+              <div class="quick-btns">
+                <button type="button" class="quick-btn" id="consonants-all" title="Alle Konsonanten anwählen">Alle</button>
+                <button type="button" class="quick-btn" id="consonants-none" title="Alle Konsonanten abwählen">Keine</button>
+              </div>
+            </div>
             <div class="letter-toggles" id="consonant-toggles"></div>
+          </div>
+          <div class="words-found-info" id="words-found-info" hidden>
+            <span id="words-count-text"></span>
           </div>
         </div>
       </details>
@@ -89,6 +106,7 @@
       </button>
     </footer>
   </div>
+  <script src="words.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
