@@ -8,10 +8,120 @@ const ALL_CONSONANTS = [
   "b", "c", "d", "f", "g", "h", "j", "k", "l", "m",
   "n", "p", "q", "r", "s", "t", "v", "w", "x", "y", "z", "ß"
 ];
-// Konsonanten, die standardmäßig im Silben-Modus sinnvoll klingen
-const SYLLABLE_CONSONANTS = ["b", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "r", "s", "t", "w"];
 
 const WORDS_PER_ROUND = 20;
+
+// Feste Silbentrennung für Komposita & Ausnahmen der Grundschule
+const COMPOUND_OVERRIDES = {
+  // Präfixe mit 2 Silben (über-, unter-, wochen-):
+  "überall": "ü·ber·all",
+  "überlegen": "ü·ber·le·gen",
+  "übernachten": "ü·ber·nach·ten",
+  "überraschen": "ü·ber·ra·schen",
+  "überzeugen": "ü·ber·zeu·gen",
+  "unterbrechen": "un·ter·bre·chen",
+  "unterhalten": "un·ter·hal·ten",
+  "untersuchen": "un·ter·su·chen",
+  "Wochenende": "Wo·chen·en·de",
+
+  // Doppelvokale & Fremdwörter:
+  "Kaffee": "Kaf·fee",
+  "Idee": "I·dee",
+  "Kakao": "Ka·kao",
+  "Ozean": "O·ze·an",
+  "Museum": "Mu·se·um",
+  "Theater": "The·a·ter",
+  "Familie": "Fa·mi·lie",
+  "Linie": "Li·nie",
+  "Ferien": "Fe·ri·en",
+
+  // Komposita:
+  "Fußball": "Fuß·ball",
+  "Spielplatz": "Spiel·platz",
+  "Spielzeug": "Spiel·zeug",
+  "Geburtstag": "Ge·burts·tag",
+  "Schwimmbad": "Schwimm·bad",
+  "Donnerstag": "Don·ners·tag",
+  "Dienstag": "Diens·tag",
+  "Mittwoch": "Mitt·woch",
+  "Freitag": "Frei·tag",
+  "Samstag": "Sams·tag",
+  "Sonntag": "Sonn·tag",
+  "Montag": "Mon·tag",
+  "Frühstück": "Früh·stück",
+  "frühstücken": "früh·stü·cken",
+  "Weihnachten": "Weih·nach·ten",
+  "Zuschauer": "Zu·schau·er",
+  "Werkstatt": "Werk·statt",
+  "Taschentuch": "Ta·schen·tuch",
+  "Flugzeug": "Flug·zeug",
+  "Sonnenblume": "Son·nen·blu·me",
+  "Schneemann": "Schnee·mann",
+  "Eisenbahn": "Ei·sen·bahn",
+  "Krankenhaus": "Kran·ken·haus",
+  "Kindergarten": "Kin·der·gar·ten",
+  "Handschuh": "Hand·schuh",
+  "Handschuhe": "Hand·schu·he",
+  "Schulhof": "Schul·hof",
+  "Haustür": "Haus·tür",
+  "Turnschuh": "Turn·schuh",
+  "Zahnbürste": "Zahn·bürs·te",
+
+  // Spezielle Verben mit abtrennbarer Vorsilbe:
+  "einladen": "ein·la·den",
+  "einzeln": "ein·zeln",
+  "einfach": "ein·fach",
+  "vorbereiten": "vor·be·rei·ten",
+  "vorstellen": "vor·stel·len",
+  "Vorhang": "Vor·hang",
+  "Vorsicht": "Vor·sicht",
+  "vorsichtig": "vor·sich·tig",
+  "warmhalten": "warm·hal·ten",
+  "hinlegen": "hin·le·gen",
+  "hinsetzen": "hin·set·zen",
+  "umarmen": "um·ar·men",
+  "umdrehen": "um·dre·hen",
+  "umziehen": "um·zie·hen",
+  "Abend": "A·bend",
+  "bequem": "be·quem",
+  "Krokodil": "Kro·ko·dil",
+  "Schokolade": "Scho·ko·la·de",
+  "telefonieren": "te·le·fo·nie·ren",
+  "spazieren": "spa·zie·ren",
+
+  // Verben mit Präfix ver-, er-, be-, zer-, ent-:
+  "verändern": "ver·än·dern",
+  "verbieten": "ver·bie·ten",
+  "verbinden": "ver·bin·den",
+  "verbrennen": "ver·bren·nen",
+  "verbringen": "ver·brin·gen",
+  "verdienen": "ver·die·nen",
+  "vergessen": "ver·ges·sen",
+  "vergleichen": "ver·glei·chen",
+  "verstecken": "ver·ste·cken",
+  "verstehen": "ver·ste·hen",
+  "versuchen": "ver·su·chen",
+  "vertrauen": "ver·trau·en",
+  "verwandeln": "ver·wan·deln",
+  "verzeihen": "ver·zei·hen",
+
+  "erfinden": "er·fin·den",
+  "erhalten": "er·hal·ten",
+  "erinnern": "er·in·nern",
+  "erkälten": "er·käl·ten",
+  "erklären": "er·klä·ren",
+  "erlauben": "er·lau·ben",
+  "erleben": "er·le·ben",
+  "erreichen": "er·rei·chen",
+  "erschrecken": "er·schre·cken",
+  "erzählen": "er·zäh·len",
+
+  "beschreiben": "be·schrei·ben",
+  "betrügen": "be·trü·gen",
+  "bestellen": "be·stel·len",
+  "zerstören": "zer·stö·ren",
+  "entdecken": "ent·de·cken"
+};
 
 const $ = (id) => document.getElementById(id);
 const card = $("card");
@@ -34,7 +144,8 @@ let total = 0;
 let misses = new Set();
 let busy = false;
 
-// Einstellungen für Silben & Wörter
+// Einstellungen
+let colorSyllables = localStorage.getItem("letters_color_syllables") !== "false"; // Standard: an
 let syllableCount = 2; // für Silben-Modus (1, 2, 3, 4)
 let wordSyllableFilter = "all"; // für Wörter-Modus ("all", 1, 2, 3, 4)
 let activeVowels = new Set(["a", "e", "i", "o", "u", "ä", "ö", "ü", "ei", "eu"]);
@@ -54,30 +165,94 @@ function buildLetterDeck() {
   return [...UPPER, ...LOWER];
 }
 
-/* ---- Silben-Generator (Fantasiewörter) ---- */
+/* ---- Silbentrennung nach Grundschulregeln ---- */
+function splitWordIntoSyllables(word) {
+  if (COMPOUND_OVERRIDES[word]) {
+    return COMPOUND_OVERRIDES[word].split("·");
+  }
+
+  // Ersetze qu temporär durch Q (damit u nicht als eigener Vokalkern zählt)
+  let clean = word.replace(/qu/gi, (match) => match[0] === 'Q' ? 'Q' : 'q');
+
+  // Doppelvokale ee, aa, oo als 1 Vokalkern (Langvokale)
+  const vRegex = /(ei|ey|ai|ay|eu|äu|au|ie|ee|aa|oo|[aeiouyäöü])/gi;
+  const vowels = [];
+  let m;
+  while ((m = vRegex.exec(clean)) !== null) {
+    vowels.push({ index: m.index, length: m[0].length });
+  }
+
+  if (vowels.length <= 1) return [word];
+
+  const syllables = [];
+  let lastIdx = 0;
+
+  for (let i = 0; i < vowels.length - 1; i++) {
+    const v1 = vowels[i];
+    const v2 = vowels[i + 1];
+    const consStart = v1.index + v1.length;
+    const consEnd = v2.index;
+    const cons = clean.substring(consStart, consEnd);
+
+    let splitAt = 0;
+    const consLower = cons.toLowerCase();
+
+    if (cons.length === 0) {
+      splitAt = 0;
+    } else if (cons.length === 1) {
+      splitAt = 0;
+    } else if (consLower === "ch" || consLower === "sch" || consLower === "ph" || consLower === "th" || consLower === "ck") {
+      splitAt = 0;
+    } else if (consLower.endsWith("sch")) {
+      splitAt = cons.length - 3;
+    } else if (consLower.endsWith("ch")) {
+      splitAt = cons.length - 2;
+    } else if (consLower.endsWith("ck")) {
+      splitAt = 0;
+    } else if (cons.length === 2) {
+      splitAt = 1;
+    } else if (cons.length >= 3) {
+      if (consLower.endsWith("st")) {
+        splitAt = cons.length - 2;
+      } else {
+        splitAt = cons.length - 1;
+      }
+    }
+
+    const cutPoint = consStart + splitAt;
+    syllables.push(word.substring(lastIdx, cutPoint));
+    lastIdx = cutPoint;
+  }
+
+  syllables.push(word.substring(lastIdx));
+  return syllables;
+}
+
+/* ---- Silben-Generator (Fantasiewörter mit Silben-Markierung) ---- */
 function pickRandom(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
 function generateSyllableWord(numSyllables, vowels, consonants) {
   const startWithVowel = Math.random() < 0.5;
-  let word = "";
+  const syllables = [];
   for (let i = 0; i < numSyllables; i++) {
+    let syl = "";
     if (startWithVowel) {
-      word += pickRandom(vowels) + pickRandom(consonants);
+      syl = pickRandom(vowels) + pickRandom(consonants);
     } else {
-      word += pickRandom(consonants) + pickRandom(vowels);
+      syl = pickRandom(consonants) + pickRandom(vowels);
     }
+    syllables.push(syl);
   }
-  if (Math.random() < 0.5) {
-    word = word.charAt(0).toUpperCase() + word.slice(1);
+  if (Math.random() < 0.5 && syllables.length > 0) {
+    syllables[0] = syllables[0].charAt(0).toUpperCase() + syllables[0].slice(1);
   }
-  return word;
+  return syllables.join("·");
 }
 
 function buildSyllableDeck() {
   const vowels = [...activeVowels];
-  // Für Silben nur Konsonanten nutzen, die aktiv sind
   const consonants = [...activeConsonants].filter(c => c !== "ß");
 
   if (vowels.length === 0 || consonants.length === 0) {
@@ -93,10 +268,9 @@ function buildSyllableDeck() {
   return [...words];
 }
 
-/* ---- Wörter-Modus (Echter Grundwortschatz Grundschule) ---- */
+/* ---- Wörter-Modus (Grundwortschatz Grundschule) ---- */
 function countSyllables(word) {
   const w = word.toLowerCase().replace(/[^a-zäöüß]/g, "");
-  // Diphthonge und Vokale als Silbenkerne zählen
   const matches = w.match(/(?:ei|ey|ai|ay|eu|äu|au|ie|[aeiouyäöü])/g);
   return matches ? matches.length : 1;
 }
@@ -106,7 +280,6 @@ function getMatchingWords() {
     return [];
   }
 
-  // Erlaubte Einzelbuchstaben zusammenstellen
   const allowed = new Set();
   activeVowels.forEach(v => {
     v.toLowerCase().split("").forEach(ch => allowed.add(ch));
@@ -116,7 +289,6 @@ function getMatchingWords() {
   });
 
   return BASIC_WORDS.filter(word => {
-    // 1. Silbenfilter prüfen
     if (wordSyllableFilter !== "all") {
       const s = countSyllables(word);
       const target = parseInt(wordSyllableFilter, 10);
@@ -126,7 +298,6 @@ function getMatchingWords() {
         return false;
       }
     }
-    // 2. Buchstabenfilter: Jedes Zeichen muss erlaubt sein
     const chars = word.toLowerCase().split("");
     return chars.every(ch => allowed.has(ch));
   });
@@ -159,7 +330,9 @@ function buildWordsDeck() {
     return [];
   }
   const shuffled = shuffle([...matches]);
-  return shuffled.slice(0, Math.min(WORDS_PER_ROUND, shuffled.length));
+  const picked = shuffled.slice(0, Math.min(WORDS_PER_ROUND, shuffled.length));
+  // Wörter mit Silbentrennzeichen vorbereiten
+  return picked.map(w => splitWordIntoSyllables(w).join("·"));
 }
 
 /* ---- UI: Einstellungen & Toggles ---- */
@@ -167,7 +340,7 @@ function initSettingsUI() {
   const vowelContainer = $("vowel-toggles");
   const consonantContainer = $("consonant-toggles");
 
-  // Vokal-Buttons erstellen
+  // Vokal-Buttons
   ALL_VOWELS.forEach(v => {
     const btn = document.createElement("button");
     btn.className = "letter-toggle";
@@ -186,7 +359,7 @@ function initSettingsUI() {
     vowelContainer.appendChild(btn);
   });
 
-  // Konsonanten-Buttons erstellen
+  // Konsonanten-Buttons
   ALL_CONSONANTS.forEach(c => {
     const btn = document.createElement("button");
     btn.className = "letter-toggle";
@@ -210,12 +383,23 @@ function initSettingsUI() {
       document.querySelectorAll(".syl-count").forEach(b => b.setAttribute("aria-pressed", "false"));
       btn.setAttribute("aria-pressed", "true");
       if (mainMode === "words") {
-        wordSyllableFilter = btn.dataset.count; // "all", "1", "2", "3", "4"
+        wordSyllableFilter = btn.dataset.count;
       } else {
         syllableCount = parseInt(btn.dataset.count, 10);
       }
       updateWordsCountInfo();
       start();
+    });
+  });
+
+  // Silbenfarben Umschalter (Bunt / Aus)
+  document.querySelectorAll(".syl-color-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".syl-color-btn").forEach(b => b.setAttribute("aria-pressed", "false"));
+      btn.setAttribute("aria-pressed", "true");
+      colorSyllables = btn.dataset.color === "on";
+      localStorage.setItem("letters_color_syllables", String(colorSyllables));
+      render(); // Sofort neu einfärben ohne Stapel neu zu mischen
     });
   });
 
@@ -259,10 +443,8 @@ function initSettingsUI() {
 }
 
 function updateModeVisibility() {
-  // Buchstaben-Modus Leiste nur bei "letters"
   $("letter-modes").hidden = mainMode !== "letters";
 
-  // Einstellungsmenü bei Silben und Wörter anzeigen
   const settingsEl = $("syllable-settings");
   if (mainMode === "letters") {
     settingsEl.setAttribute("hidden", "");
@@ -270,24 +452,26 @@ function updateModeVisibility() {
     settingsEl.removeAttribute("hidden");
   }
 
-  // "Alle" Silben Button nur im Wörter-Modus
   const allSylBtn = $("syl-count-all");
   if (allSylBtn) {
     allSylBtn.hidden = mainMode !== "words";
   }
 
-  // Im Wörter-Modus "EI" und "EU" ausblenden (Einzellaut-Filterung)
   document.querySelectorAll("#vowel-toggles .letter-toggle-wide").forEach(btn => {
     btn.hidden = mainMode === "words";
   });
 
-  // Silben-Buttons passend zum Modus markieren
   document.querySelectorAll(".syl-count").forEach(b => {
     if (mainMode === "words") {
       b.setAttribute("aria-pressed", b.dataset.count === wordSyllableFilter ? "true" : "false");
     } else {
       b.setAttribute("aria-pressed", b.dataset.count === String(syllableCount) ? "true" : "false");
     }
+  });
+
+  // Silbenfarben-Buttons synchronisieren
+  document.querySelectorAll(".syl-color-btn").forEach(b => {
+    b.setAttribute("aria-pressed", (colorSyllables && b.dataset.color === "on") || (!colorSyllables && b.dataset.color === "off") ? "true" : "false");
   });
 
   updateWordsCountInfo();
@@ -327,7 +511,6 @@ function render() {
     return;
   }
 
-  // Standard: White-Space wieder einzeilig
   letterEl.style.whiteSpace = "nowrap";
   letterEl.style.lineHeight = "";
 
@@ -346,13 +529,27 @@ function render() {
     return;
   }
 
-  const letter = queue[0];
-  letterEl.textContent = letter;
+  const rawItem = queue[0];
+  const cleanWord = rawItem.replace(/·/g, "");
 
-  // Schriftgröße dynamisch anpassen für Silben & Wörter
+  // Wort darstellen: entweder mit farbigen Silben oder einfarbig
+  if ((mainMode === "syllables" || mainMode === "words") && colorSyllables) {
+    const parts = rawItem.split("·");
+    letterEl.textContent = "";
+    parts.forEach((part, idx) => {
+      const span = document.createElement("span");
+      span.className = `syl-part-${idx % 2}`;
+      span.textContent = part;
+      letterEl.appendChild(span);
+    });
+  } else {
+    letterEl.textContent = cleanWord;
+  }
+
+  // Schriftgröße dynamisch anpassen
   if (mainMode === "syllables" || mainMode === "words") {
     card.classList.add("syllable-card");
-    const len = letter.length;
+    const len = cleanWord.length;
     const cardWidth = card.clientWidth || 300;
     const px = Math.min(cardWidth * 0.8, Math.max(32, (cardWidth * 1.3) / len));
     letterEl.style.fontSize = px + "px";
@@ -361,8 +558,8 @@ function render() {
     letterEl.style.fontSize = "";
   }
 
-  // Farbe basierend auf erstem Buchstaben
-  card.dataset.c = letter.toLowerCase().charCodeAt(0) % COLOR_COUNT;
+  // Kartenfarbe: für Buchstaben oder wenn Silbenfarben aus sind
+  card.dataset.c = cleanWord.toLowerCase().charCodeAt(0) % COLOR_COUNT;
   ghost.hidden = queue.length < 2;
 }
 
@@ -450,7 +647,7 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "ArrowLeft") answer(false);
 });
 
-/* Buchstaben-Modi (Groß / Klein / Beide) */
+/* Buchstaben-Modi */
 document.querySelectorAll(".mode").forEach((btn) => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".mode").forEach((b) => b.setAttribute("aria-pressed", "false"));
@@ -460,7 +657,7 @@ document.querySelectorAll(".mode").forEach((btn) => {
   });
 });
 
-/* Hauptmodus-Umschalter (Buchstaben / Silben / Wörter) */
+/* Hauptmodus-Umschalter */
 document.querySelectorAll(".main-mode").forEach((btn) => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".main-mode").forEach((b) => b.setAttribute("aria-pressed", "false"));

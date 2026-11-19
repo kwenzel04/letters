@@ -24,6 +24,8 @@
   --l3: #8f5600;
   --l4: #a82a86;
   --l5: #1c64b8;
+  --syl-0: #1a56db;
+  --syl-1: #e02424;
   --card-shadow: 0 24px 40px -16px rgba(60, 50, 160, .35);
 }
 
@@ -45,6 +47,8 @@
     --l3: #ffc247;
     --l4: #ff9de0;
     --l5: #7dc0ff;
+    --syl-0: #60a5fa;
+    --syl-1: #f87171;
     --card-shadow: 0 24px 40px -16px rgba(0, 0, 0, .6);
   }
 }
@@ -200,6 +204,28 @@ body {
   color: var(--on-primary);
 }
 
+.syl-color-btns {
+  display: flex;
+  gap: 4px;
+}
+
+.syl-color-btn {
+  font: inherit;
+  font-size: 0.95rem;
+  padding: 4px 14px;
+  min-height: 36px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--track);
+  color: var(--ink);
+  cursor: pointer;
+  transition: background .2s, color .2s;
+}
+.syl-color-btn[aria-pressed="true"] {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
 .syllable-count-btns {
   display: flex;
   flex-wrap: wrap;
@@ -324,6 +350,10 @@ body {
 
 /* Kleinere Schrift für Silben-Wörter */
 .syllable-card { overflow: hidden; }
+
+/* Silbenfarben für didaktisches Lesen */
+.syl-part-0 { color: var(--syl-0); }
+.syl-part-1 { color: var(--syl-1); }
 .card[data-c="1"] { color: var(--l1); }
 .card[data-c="2"] { color: var(--l2); }
 .card[data-c="3"] { color: var(--l3); }
